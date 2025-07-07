@@ -1,43 +1,29 @@
 # 必要に応じて変更する。
-KEY_SIZES = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.75, 6.25] # 使えるキーキャップのサイズのリスト。
 TARGET_WIDTH = 10.75 # 横幅の指定。
 MAX_KEYS = 10  # 使うキーキャップの最大数。
+KEY_SIZES = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.75, 6.25] # 使えるキーキャップのサイズのリスト。
+KEY_LIMITS = { # 使えるキーキャップの個数の制約
+  1.0 => MAX_KEYS,  # 1.0 には特別な制約はない
+  1.25 => 6,        # 1.25 U のキーキャップが 6 個まで
+  1.5 => 1,
+  1.75 => 0,        # 1.75 U のキーキャップは使わない
+  2.0 => 1,
+  2.25 => 2,
+  2.75 => 1,
+  6.25 => 1
+}.freeze
 
-# 必要に応じて変更する2。使えるキーキャップに制約があるならここで設定変更。
 def valid_combination?(combo)
-  # たとえば 1.25 U のキーキャップが 6 個までしか使えない、という制約はこう書く↓
-  return false if combo.count(1.25) > 6
-  return false if combo.count(1.5) > 1
-  return false if combo.count(1.75) > 0 # 1.75 U のキーキャップは使わない
-  return false if combo.count(2.0) > 1
-  return false if combo.count(2.25) > 2
-  return false if combo.count(2.75) > 1
-  return false if combo.count(6.25) > 1
+  # 各キーキャップサイズの個数制限をチェック
+  KEY_LIMITS.each do |size, max_count|
+    return false if combo.count(size) > max_count
+  end
 
   combo.sum.round(2) == TARGET_WIDTH
 end
 
 def get_max_count_for_size(size)
-  case size
-  when 1.0
-    MAX_KEYS  # 1.0 には特別な制約はない
-  when 1.25
-    6
-  when 1.5
-    1
-  when 1.75
-    0  # 1.75 U のキーキャップは使わない
-  when 2.0
-    1
-  when 2.25
-    2
-  when 2.75
-    1
-  when 6.25
-    1
-  else
-    0  # 定義されていないサイズは使わない
-  end
+  KEY_LIMITS[size] || 0  # 定義されていないサイズは使わない
 end
 
 def backtrack(current_combo, current_sum, results)
