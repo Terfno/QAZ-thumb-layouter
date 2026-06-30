@@ -1,12 +1,12 @@
 # 必要に応じて変更する。
-TARGET_WIDTH = 10.75 # 横幅の指定。
-MAX_KEYS = 10  # 使うキーキャップの最大数。
-KEY_SIZES = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.75, 6.25] # 使えるキーキャップのサイズのリスト。
+TARGET_WIDTH = 10.5 # 横幅の指定。
+MAX_KEYS = 10 # 使うキーキャップの最大数。
+KEY_SIZES = [1.0, 1.25, 1.75, 2.0, 2.25, 2.75, 6.25] # 使えるキーキャップのサイズのリスト。
 KEY_LIMITS = { # 使えるキーキャップの個数の制約
-  1.0 => MAX_KEYS,  # 1.0 には特別な制約はない
-  1.25 => 6,        # 1.25 U のキーキャップが 6 個まで
-  1.5 => 1,
-  1.75 => 0,        # 1.75 U のキーキャップは使わない
+  1.0 => MAX_KEYS,
+  1.25 => 5,
+  1.5 => 0,
+  1.75 => 1,
   2.0 => 1,
   2.25 => 2,
   2.75 => 1,
@@ -23,7 +23,7 @@ def valid_combination?(combo)
 end
 
 def get_max_count_for_size(size)
-  KEY_LIMITS[size] || 0  # 定義されていないサイズは使わない
+  KEY_LIMITS[size] || 0 # 定義されていないサイズは使わない
 end
 
 def backtrack(current_combo, current_sum, results)
@@ -60,7 +60,7 @@ end
 
 combinations = generate_combinations.sort
 
-combinations.each_with_index do |combo, i|
+combinations.each_with_index do |combo, _i|
   key_labels = []
   size_counts = Hash.new(0)
 
@@ -69,38 +69,38 @@ combinations.each_with_index do |combo, i|
     case size
     when 1.0
       size_counts[1.0] += 1
-      if size_counts[1.0] % 3 == 1
-        key_labels << "Q"
-      elsif size_counts[1.0] % 3 == 2
-        key_labels << "A"
-      else
-        key_labels << "Z"
-      end
+      key_labels << if size_counts[1.0] % 3 == 1
+                      'Q'
+                    elsif size_counts[1.0] % 3 == 2
+                      'A'
+                    else
+                      'Z'
+                    end
     when 1.25
       key_labels << "Mod \n 1.25U"
     when 1.5
       size_counts[1.5] += 1
-      if size_counts[1.5] == 1
-        key_labels << "Tab \n 1.5U"
-      else
-        key_labels << "|,\\ \n 1.5U"
-      end
+      key_labels << if size_counts[1.5] == 1
+                      "Tab \n 1.5U"
+                    else
+                      "|,\\ \n 1.5U"
+                    end
     when 1.75
       size_counts[1.75] += 1
-      if size_counts[1.75] == 1
-        key_labels << "Caps \n 1.75U"
-      else
-        key_labels << "Shift \n 1.75U"
-      end
+      key_labels << if size_counts[1.75] == 1
+                      "Caps \n 1.75U"
+                    else
+                      "Shift \n 1.75U"
+                    end
     when 2.0
       key_labels << "Backspace \n 2U"
     when 2.25
       size_counts[2.25] += 1
-      if size_counts[2.25] == 1
-        key_labels << "Shift \n 2.25U"
-      else
-        key_labels << "Enter \n 2.25U"
-      end
+      key_labels << if size_counts[2.25] == 1
+                      "Shift \n 2.25U"
+                    else
+                      "Enter \n 2.25U"
+                    end
     when 2.75
       key_labels << "Shift \n 2.75U"
     when 6.25
@@ -115,7 +115,7 @@ combinations.each_with_index do |combo, i|
     if size == 1.0
       key_labels[index]
     else
-      [{w: size},key_labels[index]]
+      [{ w: size }, key_labels[index]]
     end
   end
 
